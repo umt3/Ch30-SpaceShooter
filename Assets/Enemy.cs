@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    [Header("set in Inspector: Enemy")]
+    [Header("Set in Inspector: Enemy")]
     public float speed = 10f;
     public float fireRate = 0.3f;
     public float health = 10;
@@ -12,12 +12,10 @@ public class Enemy : MonoBehaviour
 
     private BoundsCheck bndCheck;
 
-    private void Awake()
+    void Awake()
     {
         bndCheck = GetComponent<BoundsCheck>();
     }
-
-    // this is a property: a method that acts like a field
 
     public Vector3 pos
     {
@@ -31,39 +29,44 @@ public class Enemy : MonoBehaviour
         }
     }
 
- void Update()
+    // Start is called before the first frame update
+    void Start()
     {
-        Move();  
-   
-    if(bndCheck != null && !bndCheck.isOnScreen)
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        Move();
+
+        if (bndCheck != null && bndCheck.offDown)
         {
             Destroy(gameObject);
-            //check to make sure its gone off the bottom of the screen
             if (pos.y < bndCheck.camHeight - bndCheck.radius)
             {
                 Destroy(gameObject);
             }
         }
-
-
-
     }
-
     public virtual void Move()
     {
         Vector3 tempPos = pos;
         tempPos.y -= speed * Time.deltaTime;
         pos = tempPos;
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+    void OnCollisionEnter(Collision coll)
     {
-        
+        GameObject otherGO = coll.gameObject;
+        if (otherGO.tag == "ProjectileHero")
+        {
+            Destroy(otherGO);
+            Destroy(gameObject);
+        }
+        else
+        {
+            print("Enemy hit by non-ProjectileHero: " + otherGO.name);
+        }
     }
 }
